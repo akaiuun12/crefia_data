@@ -11,4 +11,8 @@ with sqlite3.connect(db_filename) as conn:
 
 # Now df contains the data from master.db and is ready for preprocessing
 df
-# %%
+# %% 회원수
+df_mbrs = df[df['대분류'] == '회원수']
+df_mbrs
+
+# %% 
