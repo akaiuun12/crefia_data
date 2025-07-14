@@ -6,8 +6,8 @@ data_dir = 'data'
 csv_dir = 'csv'
 os.makedirs(csv_dir, exist_ok=True)
 
-# Load crefia_label.csv (now in csv_dir)
-crefia_label_path = os.path.join(csv_dir, 'crefia_label.csv')
+# Load crefia_label.csv (now in root directory)
+crefia_label_path = 'crefia_label.csv'
 df_label = pd.read_csv(crefia_label_path)
 
 # List all .xls files in the data directory
@@ -26,6 +26,16 @@ for xls_file in xls_files:
         
         # Replace first five columns with crefia_label.csv columns using pd.concat
         df = pd.concat([df_label, df.iloc[:, 5:]], axis=1)
+
+        # Add 기준년월 column
+        df.insert(0, '기준년월', label)
+
+        # Melt the DataFrame so that all columns after the first five become rows
+        df = df.melt(
+            id_vars=['기준년월','신용체크구분','개인법인구분','대분류','중분류','소분류'],
+            var_name='구분',
+            value_name='value'
+        )
         df.to_csv(crefia_csv_path, index=False)
         print(f"Converted {xls_file} to {crefia_csv_file} (first five columns replaced with crefia_label.csv)")
     else:
