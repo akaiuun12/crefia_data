@@ -54,8 +54,6 @@ plt.rcParams['axes.unicode_minus'] = False
 st.title('월별 카드사별 해지회원수')
 st.subheader('카드사별 월별 해지회원수 (Line Graph)')
 
-# Ensure '기준년월' is string and formatted as YYYY-MM
-df_mbrs['기준년월'] = df_mbrs['기준년월'].astype(str).str.zfill(6)
 
 # Optionally, sort by '기준년월' for correct plotting order
 df_mbrs = df_mbrs.sort_values('기준년월')

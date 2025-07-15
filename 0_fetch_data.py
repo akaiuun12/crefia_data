@@ -25,7 +25,7 @@ for xls_file in xls_files:
         df = pd.read_excel(xls_path)
         
         # Replace first five columns with crefia_label.csv columns using pd.concat
-        df = pd.concat([df_label, df.iloc[:, 5:]], axis=1)
+        df = pd.concat([df_label, df.iloc[:, 5:].apply(pd.to_numeric, errors='coerce')], axis=1)
 
         # Add 기준년월 column
         df.insert(0, '기준년월', label)

@@ -20,6 +20,13 @@ df_list = []
 for file in csv_files:
     file_path = os.path.join(csv_folder, file)
     df = pd.read_csv(file_path)
+    # Ensure 'value' column is numeric
+    if 'value' in df.columns:
+        df['value'] = pd.to_numeric(df['value'], errors='coerce')
+    # Ensure '기준년월' is string and formatted as YYYY-MM
+    if '기준년월' in df.columns:
+        df['기준년월'] = df['기준년월'].astype(str).str.zfill(6)
+
     df_list.append(df)
 
 if df_list:
