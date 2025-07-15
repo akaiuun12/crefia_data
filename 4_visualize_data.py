@@ -29,15 +29,19 @@ CI_color = {
     '하나카드': '#1DB2A5',  # 하나 민트
     'KB국민카드': '#FFBC00', # KB Yellow Positive
 }
+# Build color scale for Altair using CI_color
+CI_color_scale = alt.Scale(domain=list(CI_color.keys()), range=list(CI_color.values()))
 
 # %% 0. Title
-st.title('여신금융협회 자료 분석 - 카드사별 실적')
+st.title('여신금융협회 자료 분석 (카드사별)')
+st.divider()
 
 
 # %% 1. Sales
 
 
 # %% 2. Members
+
 # ==============================================================
 # 2-1. Total Members
 # ==============================================================
@@ -59,7 +63,6 @@ st.subheader('전체회원수 (신용카드 - 개인)')
 
 # Prepare the data for Altair
 df_chart = df_mbrs_psn_crd.copy()
-df_chart['기준년월'] = df_chart['기준년월'].astype(str)
 
 # Add period selection component
 periods = sorted(df_chart['기준년월'].unique())
@@ -67,7 +70,8 @@ default_period = [periods[0], periods[-1]] if len(periods) > 1 else periods
 selected_period = st.select_slider(
     '기간 선택 (기준년월)',
     options=periods,
-    value=default_period
+    value=default_period,
+    label_visibility='collapsed'
 )
 
 # Filter data by selected period
@@ -80,18 +84,50 @@ df_chart_period = df_chart[
     (df_chart['기준년월'] >= start_period) & (df_chart['기준년월'] <= end_period)
 ]
 
-# Build color scale for Altair using CI_color
-color_scale = alt.Scale(domain=list(CI_color.keys()), range=list(CI_color.values()))
+# Plot Altair Graph
+highlight = alt.selection_point(fields=['구분'], bind='legend')
 
-chart = alt.Chart(df_chart_period).mark_line(point=True).encode(
-    x=alt.X('기준년월:N', title='기준년월', sort=periods),
-    y=alt.Y('value:Q', title='전체회원수'),
-    color=alt.Color('구분:N', scale=color_scale, title='카드사'),
-)
+chart = alt.Chart(df_chart_period
+    ).mark_line(
+        point={'size':50}
+    ).encode(
+        x=alt.X(
+            '기준년월:N',
+            title='기준년월',
+            sort=periods,
+            axis=alt.Axis(labelAngle=270, labelOverlap=True)
+        ),
+        y=alt.Y(
+            'value:Q',
+            title='전체회원수',
+            # Remove scale domain for autoscale
+            scale=alt.Scale()
+        ),
+        color=alt.Color(
+            '구분:N', 
+            scale=CI_color_scale, 
+            title=None,
+            legend=alt.Legend(orient='bottom')
+        ),
+        opacity=alt.condition(highlight, alt.value(1), alt.value(0.1))
+    ).add_params(
+        highlight
+    ).interactive(
+        # Pan / Zoom
+    ).properties(   
+        # Width / Height
+        height=400
+    )
+
+st.caption("ℹ️ Shift+Click legend to multi-select lines.")
 st.altair_chart(chart, use_container_width=True)
 
-st.dataframe(df_mbrs_psn_crd.pivot(
-    index='기준년월', columns='구분', values='value'))
+st.dataframe(
+    df_mbrs_psn_crd.pivot(index='기준년월', columns='구분', values='value'),
+    height=200
+    )
+st.divider()
+
 
 # ==============================================================
 # 2-2. Active Users (활동회원수)
@@ -110,7 +146,7 @@ with sqlite3.connect(db_filename) as conn:
                        '하나카드', '현대카드', 'KB국민카드')
         ''', conn)
 
-st.subheader('이용회원수 (신용카드 - 개인, 활동회원수)')
+st.subheader('이용회원수 (신용카드, 개인)')
 
 # Prepare the data for Altair
 df_active_chart = df_active_users.copy()
@@ -120,9 +156,10 @@ df_active_chart['기준년월'] = df_active_chart['기준년월'].astype(str)
 active_periods = sorted(df_active_chart['기준년월'].unique())
 default_active_period = [active_periods[0], active_periods[-1]] if len(active_periods) > 1 else active_periods
 selected_active_period = st.select_slider(
-    '기간 선택 (기준년월, 이용회원수)',
+    label='기간',
     options=active_periods,
-    value=default_active_period
+    value=default_active_period,
+    label_visibility="collapsed"
 )
 
 # Filter data by selected period
@@ -130,23 +167,44 @@ if isinstance(selected_active_period, list) or isinstance(selected_active_period
     start_active_period, end_active_period = selected_active_period
 else:
     start_active_period = end_active_period = selected_active_period
-
+    
 df_active_chart_period = df_active_chart[
     (df_active_chart['기준년월'] >= start_active_period) & (df_active_chart['기준년월'] <= end_active_period)
 ]
 
-# Build color scale for Altair using CI_color
-color_scale_active = alt.Scale(domain=list(CI_color.keys()), range=list(CI_color.values()))
+# Plot Altair chart
+highlight = alt.selection_point(fields=['구분'], bind='legend')
 
-active_chart = alt.Chart(df_active_chart_period).mark_line(point=True).encode(
-    x=alt.X('기준년월:N', title='기준년월', sort=active_periods),
-    y=alt.Y('value:Q', title='이용회원수'),
-    color=alt.Color('구분:N', scale=color_scale_active, title='카드사'),
-)
+active_chart = alt.Chart(df_active_chart_period
+    ).mark_line(
+        point={"size":50}
+    ).encode(
+        x=alt.X('기준년월:N', title='기준년월', sort=active_periods),
+        y=alt.Y('value:Q', title='이용회원수'),
+        color=alt.Color(
+            '구분:N',
+            scale=CI_color_scale,
+            title=None,
+            legend=alt.Legend(orient='bottom')
+        ),
+        opacity=alt.condition(highlight, alt.value(1), alt.value(0.1))
+    ).add_params(
+        highlight
+    ).interactive(
+        # Pan / Zoom
+    ).properties(   
+        # Width / Height
+        height=400
+    )
+
+st.caption("ℹ️ Shift+Click legend to multi-select lines.")
 st.altair_chart(active_chart, use_container_width=True)
 
 st.dataframe(df_active_users.pivot(
-    index='기준년월', columns='구분', values='value'))
+    index='기준년월', columns='구분', values='value'),
+    height=200
+)
+st.divider()
 
 # ==============================================================
 # 2-3. 신규회원수
@@ -167,17 +225,20 @@ with sqlite3.connect(db_filename) as conn:
 
 st.subheader('신규회원수 (신용카드 - 개인, 월중)')
 
+# Prepare the data for Altair
 df_new_chart = df_new_users.copy()
-df_new_chart['기준년월'] = df_new_chart['기준년월'].astype(str)
 
+# Add period selection component
 new_periods = sorted(df_new_chart['기준년월'].unique())
 default_new_period = [new_periods[0], new_periods[-1]] if len(new_periods) > 1 else new_periods
 selected_new_period = st.select_slider(
     '기간 선택 (기준년월, 신규회원수)',
     options=new_periods,
-    value=default_new_period
+    value=default_new_period,
+    label_visibility="collapsed"
 )
 
+# Filter data by selected period
 if isinstance(selected_new_period, list) or isinstance(selected_new_period, tuple):
     start_new_period, end_new_period = selected_new_period
 else:
@@ -187,17 +248,39 @@ df_new_chart_period = df_new_chart[
     (df_new_chart['기준년월'] >= start_new_period) & (df_new_chart['기준년월'] <= end_new_period)
 ]
 
-color_scale_new = alt.Scale(domain=list(CI_color.keys()), range=list(CI_color.values()))
+# Plot Altair chart
+highlight = alt.selection_point(fields=['구분'], bind='legend')
 
-new_chart = alt.Chart(df_new_chart_period).mark_line(point=True).encode(
-    x=alt.X('기준년월:N', title='기준년월', sort=new_periods),
-    y=alt.Y('value:Q', title='신규회원수'),
-    color=alt.Color('구분:N', scale=color_scale_new, title='카드사'),
-)
+new_chart = alt.Chart(df_new_chart_period
+    ).mark_line(
+        point=True
+    ).encode(
+        x=alt.X('기준년월:N', title='기준년월', sort=new_periods),
+        y=alt.Y('value:Q', title='신규회원수'),
+        color=alt.Color(
+            '구분:N',
+            scale=CI_color_scale,
+            title=None,
+            legend=alt.Legend(orient='bottom')
+        ),
+        opacity=alt.condition(highlight, alt.value(1), alt.value(0.1))
+    ).add_params(
+        highlight
+    ).interactive(
+        # Pan / Zoom
+    ).properties(   
+        # Width / Height
+        height=400
+    )
+
+st.caption("ℹ️ Shift+Click legend to multi-select lines.")
 st.altair_chart(new_chart, use_container_width=True)
 
-st.dataframe(df_new_users.pivot(
-    index='기준년월', columns='구분', values='value'))
+st.dataframe(
+    df_new_users.pivot(index='기준년월', columns='구분', values='value'),
+    height=200
+)
+st.divider()
 
 # ==============================================================
 # 2-4. 해지회원수
@@ -218,17 +301,20 @@ with sqlite3.connect(db_filename) as conn:
 
 st.subheader('해지회원수 (신용카드 - 개인, 월중)')
 
+# Prepare the data for Altair
 df_cancel_chart = df_cancel_users.copy()
-df_cancel_chart['기준년월'] = df_cancel_chart['기준년월'].astype(str)
 
+# Add period selection component
 cancel_periods = sorted(df_cancel_chart['기준년월'].unique())
 default_cancel_period = [cancel_periods[0], cancel_periods[-1]] if len(cancel_periods) > 1 else cancel_periods
 selected_cancel_period = st.select_slider(
     '기간 선택 (기준년월, 해지회원수)',
     options=cancel_periods,
-    value=default_cancel_period
+    value=default_cancel_period,
+    label_visibility="collapsed"
 )
 
+# Filter data by selected period
 if isinstance(selected_cancel_period, list) or isinstance(selected_cancel_period, tuple):
     start_cancel_period, end_cancel_period = selected_cancel_period
 else:
@@ -238,17 +324,37 @@ df_cancel_chart_period = df_cancel_chart[
     (df_cancel_chart['기준년월'] >= start_cancel_period) & (df_cancel_chart['기준년월'] <= end_cancel_period)
 ]
 
-color_scale_cancel = alt.Scale(domain=list(CI_color.keys()), range=list(CI_color.values()))
+# Plot Altair chart
+highlight = alt.selection_point(fields=['구분'], bind='legend')
 
-cancel_chart = alt.Chart(df_cancel_chart_period).mark_line(point=True).encode(
-    x=alt.X('기준년월:N', title='기준년월', sort=cancel_periods),
-    y=alt.Y('value:Q', title='해지회원수'),
-    color=alt.Color('구분:N', scale=color_scale_cancel, title='카드사'),
-)
+cancel_chart = alt.Chart(df_cancel_chart_period
+    ).mark_line(
+        point={"size":50}
+    ).encode(
+        x=alt.X('기준년월:N', title='기준년월', sort=cancel_periods),
+        y=alt.Y('value:Q', title='해지회원수'),
+        color=alt.Color(
+            '구분:N', 
+            scale=CI_color_scale, 
+            title=None,
+            legend=alt.Legend(orient='bottom')
+        ),
+        opacity=alt.condition(highlight, alt.value(1), alt.value(0.1))
+    ).add_params(
+        highlight
+    ).interactive(
+        # Pan / Zoom
+    ).properties(   
+        # Width / Height
+        height=400
+    )
+    
+st.caption("ℹ️ Shift+Click legend to multi-select lines.")
 st.altair_chart(cancel_chart, use_container_width=True)
 
 st.dataframe(df_cancel_users.pivot(
-    index='기준년월', columns='구분', values='value'))
-
-
+    index='기준년월', columns='구분', values='value'),
+    height=200
+)
+st.divider()
 # %% 3. Finance
