@@ -1,6 +1,4 @@
 # Crefia Credit Card Issuer Data Visualization
-
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/f75f3e07-cfe5-4788-aee1-976a57d2dfce" />
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://crefia-data.streamlit.app)
 
 ## Features
