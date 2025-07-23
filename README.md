@@ -1,8 +1,7 @@
 # Crefia Credit Card Issuer Data Visualization
-
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://crefia-data.streamlit.app)
 
-This project provides an interactive data visualization dashboard for monthly credit card issuer statistics from Crefia (여신금융협회, The Credit Finance Association of Korea). Using Streamlit, it enables users to explore trends in membership, active users, new sign-ups, and cancellations across major Korean credit card companies.
+<img width="1080" height="690" alt="image" src="https://github.com/user-attachments/assets/9e578511-3064-4400-9f3c-7afacd6bab4e" />
 
 ## Features
 
