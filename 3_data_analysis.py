@@ -1,6 +1,7 @@
-# %% 
+# %%
 import pandas as pd
 import sqlite3
+
 
 db_filename = 'master.db'
 table_name = 'master_table'
