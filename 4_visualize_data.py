@@ -123,7 +123,8 @@ st.caption("ℹ️ Shift+Click legend to multi-select lines.")
 st.altair_chart(chart, use_container_width=True)
 
 st.dataframe(
-    df_mbrs_psn_crd.pivot(index='기준년월', columns='구분', values='value'),
+    df_mbrs_psn_crd.pivot(index='기준년월', columns='구분', values='value')\
+                   .sort_values(by='기준년월', ascending=False),
     height=200
     )
 st.divider()
@@ -200,8 +201,9 @@ active_chart = alt.Chart(df_active_chart_period
 st.caption("ℹ️ Shift+Click legend to multi-select lines.")
 st.altair_chart(active_chart, use_container_width=True)
 
-st.dataframe(df_active_users.pivot(
-    index='기준년월', columns='구분', values='value'),
+st.dataframe(
+    df_active_users.pivot(index='기준년월', columns='구분', values='value')\
+                   .sort_values(by='기준년월', ascending=False),
     height=200
 )
 st.divider()
@@ -277,7 +279,8 @@ st.caption("ℹ️ Shift+Click legend to multi-select lines.")
 st.altair_chart(new_chart, use_container_width=True)
 
 st.dataframe(
-    df_new_users.pivot(index='기준년월', columns='구분', values='value'),
+    df_new_users.pivot(index='기준년월', columns='구분', values='value')\
+                .sort_values(by='기준년월', ascending=False),
     height=200
 )
 st.divider()
@@ -352,8 +355,9 @@ cancel_chart = alt.Chart(df_cancel_chart_period
 st.caption("ℹ️ Shift+Click legend to multi-select lines.")
 st.altair_chart(cancel_chart, use_container_width=True)
 
-st.dataframe(df_cancel_users.pivot(
-    index='기준년월', columns='구분', values='value'),
+st.dataframe(
+    df_cancel_users.pivot(index='기준년월', columns='구분', values='value')\
+                   .sort_values(by='기준년월', ascending=False),
     height=200
 )
 st.divider()
