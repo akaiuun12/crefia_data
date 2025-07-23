@@ -1,6 +1,8 @@
 # Crefia Credit Card Issuer Data Visualization
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://crefia-data.streamlit.app)
 
+<img width="1346" height="870" alt="image" src="https://github.com/user-attachments/assets/9e578511-3064-4400-9f3c-7afacd6bab4e" />
+
 ## Features
 
 - **Interactive Dashboard**: Visualize and compare key metrics (total members, active users, new members, cancellations) for major credit card issuers.
