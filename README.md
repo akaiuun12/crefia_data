@@ -1,2 +1,76 @@
-# streamlit_demo
-A demonstration project showcasing the capabilities of Streamlit for building interactive and data-driven web applications in Python. 
+# Crefia Credit Card Issuer Data Visualization
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://crefia-analysis.streamlit.app)
+
+This project provides an interactive data visualization dashboard for monthly credit card issuer statistics from Crefia (여신금융협회, The Credit Finance Association of Korea). Using Streamlit, it enables users to explore trends in membership, active users, new sign-ups, and cancellations across major Korean credit card companies.
+
+## Features
+
+- **Interactive Dashboard**: Visualize and compare key metrics (total members, active users, new members, cancellations) for major credit card issuers.
+- **Time Series Analysis**: Select custom date ranges to analyze trends over time.
+- **Data Table Views**: View underlying data in pivoted tables for each metric.
+- **Multi-Card Comparison**: Easily compare across Shinhan, Hyundai, Woori, Samsung, Lotte, Hana, and KB Kookmin cards.
+- **Custom Color Coding**: Each issuer is color-coded for clarity in all visualizations.
+
+## Data Pipeline
+
+1. **Raw Data Conversion** (`0_fetch_data.py`):
+   - Converts monthly `.xls` files from the `data/` directory into standardized CSVs using column labels from `crefia_label.csv`.
+   - Outputs to the `csv/` directory.
+
+2. **Database Aggregation** (`1_to_sqlite3.py`):
+   - Merges all monthly CSVs into a single SQLite database (`master.db`) for efficient querying and analysis.
+
+3. **Preprocessing & Analysis** (`2_data_preprocessing.py`, `3_data_analysis.py`):
+   - Loads and preprocesses the master data for further analysis and visualization.
+
+4. **Visualization** (`4_visualize_data.py`):
+   - Launches a Streamlit dashboard for interactive exploration of the data.
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.7+
+- The following Python packages (see `requirements.txt`):
+  - streamlit
+  - pandas
+  - plotly
+  - seaborn
+  - matplotlib
+
+### Installation
+
+1. **Clone the repository** and navigate to the project directory.
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Prepare the data**:
+   - Place raw monthly `.xls` files in the `data/` directory.
+   - Ensure `crefia_label.csv` is in the project root.
+
+4. **Run the data pipeline**:
+   ```bash
+   python 0_fetch_data.py
+   python 1_to_sqlite3.py
+   ```
+
+5. **Launch the dashboard**:
+   ```bash
+   streamlit run 4_visualize_data.py
+   ```
+
+## Usage
+
+- Use the dashboard to select time periods and metrics.
+- Compare trends across different credit card issuers.
+- Download or inspect the underlying data tables as needed.
+
+## Data Sources
+
+- **Crefia (여신금융협회)**: Official monthly statistics on credit card usage and membership.
+
+## License
+
+This project is licensed under the MIT License. 
